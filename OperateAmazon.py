@@ -15,7 +15,9 @@ class OperateAmazon():
     def Login(driver:webdriver.Chrome,login:str,password:str):
         
         try:
-            driver.get("https://www.amazon.co.jp/ap/signin?openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.co.jp%2F%3Fref_%3Dnav_custrec_signin&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.assoc_handle=jpflex&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&")
+            driver.get("https://www.amazon.co.jp/")
+            driver.execute_script('const newProto = navigator.__proto__;delete newProto.webdriver;navigator.__proto__ = newProto;')
+            driver.find_element_by_id("nav-link-accountList").click()
             certification = False
             OperateAmazon.LoginMain(driver,login,password)
            
@@ -106,7 +108,7 @@ class OperateAmazon():
                             sleep(1)
                             continue
                     else:
-                        priceList = list[int]
+                        priceList = []
                         #表示されている価格をリストに追加していく
                         for item in ItemList:
                             priceList.append(int(item.find_element_by_class_name("a-price-whole").text.replace(",","")))
