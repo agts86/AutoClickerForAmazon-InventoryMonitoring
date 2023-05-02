@@ -1,26 +1,22 @@
 import stdiomask
 from OperateAmazon import OperateAmazon 
-from CheckUtiltys import CheckUtiltys
+from CheckUtility import CheckUtility
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from tkinter import messagebox,Tk
 from sys import exit
 
 #Amazonの自動購入プログラム
-def main():
-    
+def main():  
     Tk().withdraw()
     if not messagebox.askokcancel("確認", "このプログラムはGoogleChromeを使用します。\r\nインストール済みの方は「OK｝を押してください。\r\nまだの方は「キャンセル」を押してください。"):
         return
-        
     print("★プログラムの説明★")
     print("・入力した商品のURLの在庫を監視して、購入するツールです。")
     print("・あらかじめカートの中身は空にしておいてください。")
     print("・あらかじめ購入決済方法は一つにしておいてください。「クレジットカード」を推奨します。")
     print("・各入力項目は入力後に「Enter」キーを押してください。")
     print("・[*]がある入力項目は必須です。ないものは任意で設定してください。")
-  
-
     while True:  
         print("高速版を使用しますか？")
         print("初回起動は通常版をオススメします。")
@@ -29,33 +25,30 @@ def main():
             break
         else:
             print("yかnを入力してください")
-
     while True:   
         login = input("*ログインID(半角)>")
         if login != "":
-            if CheckUtiltys.CheckMailAddress(login):
+            if CheckUtility.IsMailAddress(login):
                 break
-            elif CheckUtiltys.CheckPhoneNumber(login):
+            elif CheckUtility.IsPhoneNumber(login):
                 break
             else:
                 print("ログインIDが不正です。")
         else:
-            print("ログインID(半角)は必須です。")
-            
+            print("ログインID(半角)は必須です。")         
     while True:  
         password = stdiomask.getpass("*ログインPassWord(半角)>")
         if password != "":
-            if CheckUtiltys.CheckHankakuEisuziKigou(password):
+            if CheckUtility.IsHalfWidthAlphanumericCharacters(password):
                 break
             else:
                 print("ログインpasswordが不正です。")
         else:
             print("ログインPassWord(半角)は必須です。")
-    
     while True:
         purchaseGoodsUrl = input("*買いたい商品のURL>")
         if purchaseGoodsUrl != "":
-            if CheckUtiltys.CheckURL(purchaseGoodsUrl,"www.amazon.co.jp"):
+            if CheckUtility.IsURL(purchaseGoodsUrl,"www.amazon.co.jp"):
                 break
             else:
                 print("AmazonのURLを入力してください。")
@@ -79,28 +72,22 @@ def main():
             break
         else:
             print("yかnを入力してください")
-
     while True:
         new = input("*新品に絞り込みますか？y/n>")
         if new == "y" or new == "n":
             break
         else:
             print("yかnを入力してください")
-
-    itmeOptions =[]
+    itemOptions =[]
     if primeEligible == "y":
-        itmeOptions.append("primeEligible")
-
+        itemOptions.append("primeEligible")
     if freeShipping == "y":
-        itmeOptions.append("freeShipping")
-
+        itemOptions.append("freeShipping")
     if new == "y":
-        itmeOptions.append("new")
-    
+        itemOptions.append("new") 
     #chromeのバージョンに合せたドライバーをインストールする
     #まぁまぁ重いから先にやっておく
     driverPath = ChromeDriverManager().install()
-    
     #シークレットブラウザ/画面サイズ最大/画像を読み込まない
     options = webdriver.ChromeOptions()
     options.add_argument('--incognito') 
@@ -109,26 +96,20 @@ def main():
     options.add_argument('--lang=ja')
     options.add_argument("--proxy-server='direct://'")
     options.add_argument("--proxy-bypass-list=*")
+    options.add_experimental_option("excludeSwitches", ['enable-automation'])
     #高速版の場合はヘッダーレス
     if headless =="y":
         options.add_argument("--headless")
-
     driver = webdriver.Chrome(driverPath,chrome_options=options)
-   
     #指定したdriverに対して最大で10秒間待つように設定する
     driver.implicitly_wait(10)
-
     #ログイン処理
     OperateAmazon.Login(driver,login,password)
-
-    OperateAmazon.Purchase(driver,OperateAmazon.MakeOffer_Listing_URL(purchaseGoodsUrl),login,password,amount,itmeOptions)
-    
-
+    OperateAmazon.Purchase(driver,OperateAmazon.CreateOffer_Listing_URL(purchaseGoodsUrl),login,password,amount,itemOptions)
     while True:
         finish = input("終了するにはEnterキーを押してください")
         if not finish:
             break
     exit()
-
 if __name__=='__main__':       
     main()

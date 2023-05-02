@@ -1,0 +1,26 @@
+@startuml 
+:カレントディレクトリをダウンロードに移動;
+note right
+     cd C:\Users\%username%\Downloads
+end note
+:Windows OSのアーキテクチャを確認;
+note right
+    echo %PROCESSOR_ARCHITECTURE%
+end note
+if (64bit) then(yes)
+    :64bitのインストーラーをダウンロード;
+    note left
+     bitsadmin /TRANSFER "download" https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise64.msi %CD%\GoogleChromeStandaloneEnterprise.msi
+    end note
+else
+    :32bitのインストーラーをダウンロード;
+    note right
+     bitsadmin /TRANSFER "download" https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise.msi %CD%\GoogleChromeStandaloneEnterprise.msi
+    end note
+endif
+:Chromeをインストール;
+note right
+     msiexec /i %CD%\GoogleChromeStandaloneEnterprise.msi
+end note
+@enduml
+

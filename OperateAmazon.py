@@ -20,7 +20,6 @@ class OperateAmazon():
             driver.find_element_by_id("nav-link-accountList").click()
             certification = False
             OperateAmazon.LoginMain(driver,login,password)
-           
             #ログインできてトップ画面にアカウント名が表示されているか確認
             if len(driver.find_elements_by_id("nav-link-accountList-nav-line-1")) > 0:
                 span:WebElement = driver.find_element_by_id("nav-link-accountList-nav-line-1")
@@ -33,7 +32,6 @@ class OperateAmazon():
                 else:
                     certification= True
                     raise Exception()
-                           
             print(datetime.now())
             print("ログイン出来ました。")
         except Exception as e:
@@ -47,7 +45,6 @@ class OperateAmazon():
                         break
                     else:
                         print("yかnを入力してください")
-
                 if certificationMail == "y":
                     while True:
                         finish = input("認証処理後にエンターキーを押してください。")
@@ -63,37 +60,29 @@ class OperateAmazon():
                     finish = input("Enterキーを押して、最初からやり直してください。")
                     if not finish:
                         exit()                      
-            
-
     #購入処理
     #driver : chromeのドライバー
     #purchaseGoodsUrl : 在庫監視するURL
     #login : ログインID
     #password : ログインパスワード
     #amount : 指定された価格
-    #itmeOptions : 絞り込みするリスト
-    def Purchase(driver:webdriver.Chrome,purchaseGoodsUrl:str,login:str,password:str,amount:str,itmeOptions:list[str]):
-        
+    #itemOptions : 絞り込みするリスト
+    def Purchase(driver:webdriver.Chrome,purchaseGoodsUrl:str,login:str,password:str,amount:str,itemOptions:list[str]):
         try:
-
             #いったんログアウトする
             driver.get("https://www.amazon.co.jp/gp/flex/sign-out.html?path=%2Fgp%2Fyourstore%2Fhome&useRedirectOnSuccess=1&signIn=1&action=sign-out&ref_=nav_signout")
             #navigator.webdriver=true回避　botだとばれないようにする
             driver.execute_script('const newProto = navigator.__proto__;delete newProto.webdriver;navigator.__proto__ = newProto;')
             print("一度ログアウトします。")
-            
             while True:
                 driver.get(purchaseGoodsUrl)
-                
                 #navigator.webdriver=true回避　botだとばれないようにする
                 driver.execute_script('const newProto = navigator.__proto__;delete newProto.webdriver;navigator.__proto__ = newProto;')
-                
-                if len(itmeOptions) > 0:
+                if len(itemOptions) > 0:
                     driver.find_element_by_class_name("a-button-inner.aod-filter-button-div").click()
-                    for option in itmeOptions:
+                    for option in itemOptions:
                         check:WebElement = driver.find_element_by_xpath('//*[@id="' + option + '"]/div/label/input')
                         driver.execute_script("arguments[0].click();",check)
-
                 if len(driver.find_elements_by_id("aod-offer")) > 0:
                     ItemList:List[WebElement] = driver.find_elements_by_id("aod-offer")
                     #価格指定があった場合は指定価格以下の値段のものを購入する
@@ -129,30 +118,25 @@ class OperateAmazon():
             driver.get("https://www.amazon.co.jp/gp/cart/view.html/ref=nav_cart")
             driver.execute_script('const newProto = navigator.__proto__;delete newProto.webdriver;navigator.__proto__ = newProto;')
             driver.find_element_by_name("proceedToRetailCheckout").click()
-
-            OperateAmazon.LoginMain(driver,login,password)
-            
+            OperateAmazon.LoginMain(driver,login,password)  
             #navigator.webdriver=true回避　botだとばれないようにする
             driver.execute_script('const newProto = navigator.__proto__;delete newProto.webdriver;navigator.__proto__ = newProto;')
             driver.find_element_by_name("placeYourOrder1").click()  
-            OperateAmazon.SuccessProsess(driver) 
-        
+            OperateAmazon.SuccessProcess(driver) 
         except Exception as e:
             print(e)
             print("何らかの不具合が発生してます")
             driver.quit()
-
     #購入成功時の処理
     #driver : chromeのドライバー
-    def SuccessProsess(driver:webdriver):
+    def SuccessProcess(driver:webdriver):
         print(datetime.now())
         print("[success]購入成功")
         sleep(5)
         driver.quit()
-
     #入力されたURLから商品IDを取り出して監視するURLを生成しなおす
     #URL : 入力されたURL
-    def MakeOffer_Listing_URL(URL:str):
+    def CreateOffer_Listing_URL(URL:str):
         array = URL.split("/")
         NextOfTarget = False
         for item in array:
@@ -170,7 +154,6 @@ class OperateAmazon():
                         exit() 
         else:     
             return "https://www.amazon.co.jp/dp/" + id + "/ref=olp-opf-redir?aod=1&ie=UTF8&condition=ALL&th=1"
-
     #ログイン画面の遷移処理
     #driver : chromeのドライバー
     #login : ログインID
@@ -184,6 +167,3 @@ class OperateAmazon():
         driver.find_element_by_name("password").send_keys(password)
         driver.find_element_by_name("rememberMe").click()
         driver.find_element_by_id("signInSubmit").click()
-
-        
-
